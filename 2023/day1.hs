@@ -4,27 +4,31 @@ import Text.Regex
 firstandlast :: [a] -> [a]
 firstandlast l = [head l, last l]
 
-wordsToNumbers :: [Char] -> Maybe Char
-wordsToNumbers s
-  | s == "nine" = Just '9'
-  | s == "eight" = Just '8'
-  | s == "seven" = Just '7'
-  | s == "six" = Just '6'
-  | s == "five" = Just '5'
-  | s == "four" = Just '4'
-  | s == "three" = Just '3'
-  | s == "two" = Just '2'
-  | s == "one" = Just '1'
-  | otherwise = Nothing
+replaceWordsWithNumbers :: String -> String
+replaceWordsWithNumbers str = foldl replaceWordWithNumber str wordsToNumbers
+  where
+    wordsToNumbers =
+      [ ("one", "o1ne"),
+        ("two", "t2wo"),
+        ("three", "th3ree"),
+        ("four", "f4our"),
+        ("five", "f5ive"),
+        ("six", "s6ix"),
+        ("seven", "sev7en"),
+        ("eight", "eig8ht"),
+        ("nine", "ni9ne"),
+        ("zero", "ze0ro")
+      ]
+    replaceWordWithNumber str (word, number) = subRegex (mkRegex word) str number
 
 replaceNumber :: [Char] -> [Char]
 replaceNumber s = aux s []
   where
     aux :: [Char] -> [Char] -> [Char]
     aux [] munch = munch
-    aux (h : t) munch = case wordsToNumbers (munch ++ [h]) of
-      Nothing -> aux t (munch ++ [h])
-      Just x -> x : t
+    aux (h : t) munch = if munch ++ [h] == val then aux t (munch ++ [h]) else val ++ t
+      where
+        val = replaceWordsWithNumbers (munch ++ [h])
 
 replaceNumbers :: String -> String
 replaceNumbers s = aux s (length s)
@@ -40,9 +44,9 @@ solvep2 :: [String] -> Int
 solvep2 = sum . map (read . firstandlast . filter isDigit . replaceNumbers)
 
 day1p1 = do
-  vals <- lines <$> readFile "./2023/input1.txt" :: IO [String]
+  vals <- lines <$> readFile "./input1.txt" :: IO [String]
   return $ solvep1 vals
 
 day1p2 = do
-  vals <- lines <$> readFile "./2023/input1.txt" :: IO [String]
+  vals <- lines <$> readFile "./input1.txt" :: IO [String]
   return $ solvep2 vals
