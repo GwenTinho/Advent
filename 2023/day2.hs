@@ -18,12 +18,9 @@ validGame :: Out -> Game -> Maybe Id
 validGame max (Game id outs) = if all (compareOut max) outs then Just id else Nothing
 
 minOut :: Game -> Out
-minOut (Game _ os) = Out (maximum reds0) (maximum greens0) (maximum blues0)
+minOut (Game _ os) = Out (maximum reds) (maximum greens) (maximum blues)
   where
-    (reds, greens, blues) = unzip3 $ map (\(Out r g b) -> (r, g, b)) os
-    reds0 = filter (/= 0) reds
-    blues0 = filter (/= 0) blues
-    greens0 = filter (/= 0) greens
+    (reds, greens, blues) = unzip3 $ filter (\(x, y, z) -> x + y + z /= 0) $ map (\(Out r g b) -> (r, g, b)) os
 
 pow :: Out -> Int
 pow (Out r g b) = r * g * b
